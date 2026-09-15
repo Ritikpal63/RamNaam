@@ -1,18 +1,11 @@
 import { Navigate, Route, Routes } from 'react-router-dom';
 import Header from './components/Header';
+import ProtectedRoute from './components/ProtectedRoute';
+import AdminDashboard from './pages/AdminDashboard';
+import Dashboard from './pages/Dashboard';
 import Home from './pages/Home';
 import Login from './pages/Login';
 import Register from './pages/Register';
-import Dashboard from './pages/Dashboard';
-import Admin from './pages/Admin';
-import { useAuth } from './context/AuthContext';
-
-function Protected({ children, admin = false }) {
-  const { user } = useAuth();
-  if (!user) return <Navigate to="/login" replace />;
-  if (admin && user.role !== 'admin') return <Navigate to="/dashboard" replace />;
-  return children;
-}
 
 export default function App() {
   return (
@@ -22,8 +15,8 @@ export default function App() {
         <Route path="/" element={<Home />} />
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Register />} />
-        <Route path="/dashboard" element={<Protected><Dashboard /></Protected>} />
-        <Route path="/admin" element={<Protected admin><Admin /></Protected>} />
+        <Route path="/dashboard" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
+        <Route path="/admin" element={<ProtectedRoute admin><AdminDashboard /></ProtectedRoute>} />
         <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
     </>

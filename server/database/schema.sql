@@ -1,5 +1,4 @@
-CREATE DATABASE IF NOT EXISTS ram_naam_abhiyan CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
-USE ram_naam_abhiyan;
+
 
 CREATE TABLE users (
   id CHAR(36) PRIMARY KEY,

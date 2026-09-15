@@ -1,16 +1,19 @@
 import { createContext, useContext, useMemo, useState } from 'react';
-import api from '../api';
+import api from '../api/client';
 
 const AuthContext = createContext(null);
 
 export function AuthProvider({ children }) {
   const [user, setUser] = useState(() => {
-    try { return JSON.parse(localStorage.getItem('ramNaamUser')) || null; }
-    catch { return null; }
+    try {
+      return JSON.parse(localStorage.getItem('ramNaamUser')) || null;
+    } catch {
+      return null;
+    }
   });
 
-  const login = async (credentials) => {
-    const { data } = await api.post('/auth/login', credentials);
+  const login = async (payload) => {
+    const { data } = await api.post('/auth/login', payload);
     localStorage.setItem('ramNaamToken', data.token);
     localStorage.setItem('ramNaamUser', JSON.stringify(data.user));
     setUser(data.user);
@@ -32,6 +35,7 @@ export function AuthProvider({ children }) {
   };
 
   const value = useMemo(() => ({ user, login, register, logout }), [user]);
+
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 }
 

@@ -2,6 +2,7 @@ import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { BookOpenCheck, Delete, PenLine, RotateCcw, Save, Undo2 } from 'lucide-react';
 import api from '../api/client';
 import { useAuth } from '../context/AuthContext';
+import { useLanguage } from '../context/LanguageContext';
 
 const PAGE_SIZE = 108;
 const RAM_SEQUENCE = ['r', 'a', 'm'];
@@ -46,6 +47,7 @@ export default function RamNaamWriter() {
   const [summary, setSummary] = useState({ todayCount: 0, totalCount: 0 });
   const inputRefs = useRef([]);
   const { user } = useAuth();
+  const { t, locale, language } = useLanguage();
 
   const completeCount = useMemo(() => cells.filter((cell) => cell.complete).length, [cells]);
 
@@ -82,7 +84,7 @@ export default function RamNaamWriter() {
       setTimeout(() => focusCell(next), 0);
     } else {
       setActiveIndex(PAGE_SIZE);
-      setMessage('🙏 108 राम नाम का पृष्ठ पूरा हो गया। अब “साधना में जमा करें” दबाएँ।');
+      setMessage(t('writer.completedPage'));
     }
   };
 
@@ -96,7 +98,7 @@ export default function RamNaamWriter() {
 
     const roman = currentCell.roman;
     if (!roman && character !== 'r' && character !== 's') {
-      setMessage('राम लिखने के लिए R दबाएँ या श्री राम लिखने के लिए S दबाएँ।');
+      setMessage(t('writer.startHint'));
       return;
     }
 
@@ -109,7 +111,7 @@ export default function RamNaamWriter() {
           : RAM_SEQUENCE)[roman.length];
 
     if (character !== expected) {
-      setMessage(`अगला अक्षर "${expected.toUpperCase()}" लिखें।`);
+      setMessage(t('writer.nextLetter', { letter: expected.toUpperCase() }));
       return;
     }
 
@@ -134,7 +136,7 @@ export default function RamNaamWriter() {
     if (event.ctrlKey || event.metaKey || event.altKey) {
       if (event.key.toLowerCase() === 'v') {
         event.preventDefault();
-        setMessage('कॉपी-पेस्ट की अनुमति नहीं है। कृपया राम नाम स्वयं लिखें।');
+        setMessage(t('writer.copyBlocked'));
       }
       return;
     }
@@ -204,12 +206,12 @@ export default function RamNaamWriter() {
 
   const blockPaste = (event) => {
     event.preventDefault();
-    setMessage('कॉपी-पेस्ट की अनुमति नहीं है। कृपया प्रत्येक राम नाम स्वयं लिखें।');
+    setMessage(t('writer.copyBlockedEach'));
   };
 
   const blockDrop = (event) => {
     event.preventDefault();
-    setMessage('Drag & Drop की अनुमति नहीं है। कृपया राम नाम स्वयं लिखें।');
+    setMessage(t('writer.dropBlocked'));
   };
 
   const handleCellClick = (index) => {
@@ -271,17 +273,17 @@ export default function RamNaamWriter() {
     setCells(makeCells());
     setActiveIndex(0);
     setPageId(makePageId());
-    setMessage('पृष्ठ साफ कर दिया गया।');
+    setMessage(t('writer.pageCleared'));
     setTimeout(() => focusCell(0), 0);
   };
 
   const deposit = async () => {
     if (!user) {
-      setMessage('साधना जमा करने के लिए पहले लॉगिन करें।');
+      setMessage(t('writer.loginToDeposit'));
       return;
     }
     if (completeCount < 1) {
-      setMessage('पहले कम से कम एक पूरा राम नाम लिखें।');
+      setMessage(t('writer.writeAtLeastOne'));
       return;
     }
 
@@ -290,7 +292,7 @@ export default function RamNaamWriter() {
     try {
       setDepositing(true);
       const { data } = await api.post('/ramnaam/deposit', { entries, pageId });
-      setMessage(`🙏 ${Number(data.count || completeCount).toLocaleString('en-IN')} राम नाम आपकी साधना में जमा हो गए।`);
+      setMessage(t('writer.deposited', { count: Number(data.count || completeCount).toLocaleString(locale) }));
       setCells(makeCells());
       setActiveIndex(0);
       setPageId(makePageId());
@@ -299,7 +301,7 @@ export default function RamNaamWriter() {
         totalCount: Number(data.totalCount || 0)
       });
     } catch (error) {
-      setMessage(error.response?.data?.message || 'अभी साधना जमा नहीं हो पाई।');
+      setMessage(language === 'hi' ? (error.response?.data?.message || t('writer.depositFailed')) : t('writer.depositFailed'));
     } finally {
       setDepositing(false);
     }
@@ -310,37 +312,37 @@ export default function RamNaamWriter() {
   return (
     <section id="write" className="section-shell feature-grid three">
       <article className="panel dashboard-preview">
-        <div className="panel-title">🙏 मेरी साधना Dashboard</div>
+        <div className="panel-title">{t('writer.dashboardTitle')}</div>
         <div className="progress-ring writer-progress-ring" style={{ '--writer-progress': `${progress}%` }}>
           <span>{progress}%</span>
         </div>
         <div className="dashboard-meta">
-          <p><b>इस पृष्ठ पर</b><br />{completeCount.toLocaleString('en-IN')} / 108</p>
-          <p><b>आज जमा</b><br />{summary.todayCount.toLocaleString('en-IN')}</p>
-          <p><b>कुल जमा</b><br />{summary.totalCount.toLocaleString('en-IN')}</p>
-          <p><b>पृष्ठ में शेष</b><br />{Math.max(0, PAGE_SIZE - completeCount)}</p>
+          <p><b>{t('writer.onPage')}</b><br />{completeCount.toLocaleString(locale)} / 108</p>
+          <p><b>{t('writer.todayDeposited')}</b><br />{summary.todayCount.toLocaleString(locale)}</p>
+          <p><b>{t('writer.totalDeposited')}</b><br />{summary.totalCount.toLocaleString(locale)}</p>
+          <p><b>{t('writer.remaining')}</b><br />{Math.max(0, PAGE_SIZE - completeCount).toLocaleString(locale)}</p>
         </div>
         <a
           className="btn primary full"
           href="#ram-writing-book"
           onClick={() => setTimeout(() => activeIndex < PAGE_SIZE && focusCell(activeIndex), 300)}
         >
-          <PenLine size={19} />श्री राम लिखना जारी रखें
+          <PenLine size={19} /> {t('writer.continue')}
         </a>
       </article>
 
       <article className="panel writer-panel ram-writer-v2" id="ram-writing-book">
-        <div className="panel-title green"><BookOpenCheck size={21} />राम नाम लेखन — 108 नाम का पृष्ठ</div>
+        <div className="panel-title green"><BookOpenCheck size={21} /> {t('writer.pageTitle')}</div>
         <div className="writer-instruction">
-          <strong>English keyboard से RAM या SHRI RAM लिखें।</strong>
-          <span>English में टाइप होगा लेकिन स्क्रीन पर हिन्दी में राम नाम दिखाई देगा।</span>
+          <strong>{t('writer.instructionStrong')}</strong>
+          <span>{t('writer.instructionSub')}</span>
         </div>
 
         <div className="ram-page-summary">
-          <span>सक्रिय खाना: <strong>{activeIndex >= PAGE_SIZE ? PAGE_SIZE : activeIndex + 1}</strong></span>
-          <span>पृष्ठ गणना: <strong>{completeCount} / {PAGE_SIZE}</strong></span>
-          <span>लिखें: <strong>RAM → राम</strong></span>
-          <span>या: <strong>SHRI RAM → श्री राम</strong></span>
+          <span>{t('writer.activeBox')}: <strong>{activeIndex >= PAGE_SIZE ? PAGE_SIZE : activeIndex + 1}</strong></span>
+          <span>{t('writer.pageCount')}: <strong>{completeCount} / {PAGE_SIZE}</strong></span>
+          <span>{t('writer.write')}: <strong>RAM → राम</strong></span>
+          <span>{t('writer.or')}: <strong>SHRI RAM → श्री राम</strong></span>
         </div>
 
         <div className="ram-writing-page">
@@ -370,7 +372,7 @@ export default function RamNaamWriter() {
                   spellCheck={false}
                   inputMode="text"
                   enterKeyHint="next"
-                  aria-label={`राम नाम ${index + 1}`}
+                  aria-label={t('writer.aria', { number: index + 1 })}
                   placeholder={active ? 'राम' : ''}
                   style={{
                     width: '100%',
@@ -392,26 +394,26 @@ export default function RamNaamWriter() {
         </div>
 
         <div className="writer-tools writer-tools-v2">
-          <button type="button" onClick={undoCharacter}><Undo2 size={18} />पिछला अक्षर</button>
-          <button type="button" onClick={clearCell} disabled={activeIndex >= PAGE_SIZE}><Delete size={18} />खाना साफ करें</button>
-          <button type="button" onClick={resetPage}><RotateCcw size={18} />पूरा पृष्ठ रीसेट</button>
-          <strong>स्वतः गिनती: {completeCount.toLocaleString('en-IN')}</strong>
+          <button type="button" onClick={undoCharacter}><Undo2 size={18} /> {t('writer.undo')}</button>
+          <button type="button" onClick={clearCell} disabled={activeIndex >= PAGE_SIZE}><Delete size={18} /> {t('writer.clearCell')}</button>
+          <button type="button" onClick={resetPage}><RotateCcw size={18} /> {t('writer.reset')}</button>
+          <strong>{t('writer.autoCount')}: {completeCount.toLocaleString(locale)}</strong>
         </div>
 
         <button className="btn primary full deposit-btn" type="button" onClick={deposit} disabled={depositing || completeCount < 1}>
-          <Save size={18} />{depositing ? 'जमा हो रहा है...' : `${completeCount.toLocaleString('en-IN')} राम नाम साधना में जमा करें`}
+          <Save size={18} /> {depositing ? t('writer.depositing') : t('writer.deposit', { count: completeCount.toLocaleString(locale) })}
         </button>
         {message && <p className="form-message">{message}</p>}
       </article>
 
       <article className="panel inspiration-panel">
-        <div className="panel-title">🏆 प्रेरणा सूची</div>
+        <div className="panel-title">{t('writer.inspiration')}</div>
         {[
-          ['भक्त अ', '5,25,000'],
-          ['भक्त ब', '3,10,000'],
-          ['भक्त स', '2,75,000'],
-          ['भक्त द', '2,10,000'],
-          ['भक्त इ', '1,85,000']
+          [t('writer.devoteeA'), '5,25,000'],
+          [t('writer.devoteeB'), '3,10,000'],
+          [t('writer.devoteeC'), '2,75,000'],
+          [t('writer.devoteeD'), '2,10,000'],
+          [t('writer.devoteeE'), '1,85,000']
         ].map((row, index) => (
           <div className="rank-row" key={row[0]}>
             <span className="rank">{index + 1}</span>
@@ -419,7 +421,7 @@ export default function RamNaamWriter() {
             <strong>{row[1]}</strong>
           </div>
         ))}
-        <p className="soft-note">यह प्रतियोगिता नहीं, एक-दूसरे को प्रेरित करने का माध्यम है।</p>
+        <p className="soft-note">{t('writer.notCompetition')}</p>
       </article>
     </section>
   );

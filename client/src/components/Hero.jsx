@@ -1,17 +1,20 @@
 import { Flower2, PenLine } from 'lucide-react';
+import { useLanguage } from '../context/LanguageContext';
 
 export default function Hero() {
+  const { t } = useLanguage();
+  const [line1, line2] = t('hero.title').split('\n');
   return (
     <section className="hero section-shell">
       <div className="hero-glow hero-glow-one" />
       <div className="hero-glow hero-glow-two" />
       <div className="hero-content">
-        <div className="eyebrow"><Flower2 size={20} /> बाबा नीम करौली महाराज की प्रेरणा से</div>
-        <h1>राम नाम लिखें,<br />जीवन में भक्ति और सकारात्मकता को स्थान दें</h1>
-        <p>प्रतिदिन कुछ समय प्रभु श्री राम को समर्पित करें। राम नाम लेखन, नाम-स्मरण, साधना और सेवा की इस सकारात्मक यात्रा से जुड़ें।</p>
+        <div className="eyebrow"><Flower2 size={20} /> {t('hero.eyebrow')}</div>
+        <h1>{line1}<br />{line2}</h1>
+        <p>{t('hero.description')}</p>
         <div className="hero-actions">
-          <a className="btn primary" href="#write"><PenLine size={20} /> राम नाम लिखना शुरू करें</a>
-          <a className="btn secondary" href="#pledge">राम नाम का संकल्प लें</a>
+          <a className="btn primary" href="#write"><PenLine size={20} /> {t('hero.start')}</a>
+          <a className="btn secondary" href="#pledge">{t('hero.takePledge')}</a>
         </div>
       </div>
       <div className="hero-art" aria-hidden="true">

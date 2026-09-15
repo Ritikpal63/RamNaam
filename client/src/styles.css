@@ -4,3 +4,14 @@
 .ram-name-cell input{touch-action:manipulation;-webkit-user-select:text;user-select:text;caret-color:#7e1d13;cursor:text}
 .ram-name-cell input:disabled{cursor:default}
 @media (pointer:coarse){.ram-name-cell{min-height:64px}.ram-name-cell input{min-height:42px;font-size:16px!important}}
+
+/* HI / EN language switcher */
+.language-switcher{display:inline-flex;align-items:center;gap:5px;padding:5px 8px;border:1px solid #e4cfad;border-radius:10px;background:#fff8eb;color:#745443;font-weight:800;white-space:nowrap}
+.language-switcher svg{color:var(--orange)}
+.language-switcher button{border:0;background:transparent;padding:3px 4px;border-radius:6px;color:#856958;font-weight:900;line-height:1}
+.language-switcher button.active{background:var(--maroon);color:#fff}
+.language-switcher span{opacity:.55}
+.header-actions-mobile{display:flex;align-items:center;gap:8px}
+.header-actions-mobile>.language-switcher{display:none}
+@media(max-width:860px){.desktop-language-switcher{display:none}.header-actions-mobile>.language-switcher{display:inline-flex}.header-actions-mobile{margin-left:auto}.brand{flex:1}.main-nav.open{z-index:60}}
+@media(max-width:560px){.language-switcher{padding:5px 6px;gap:3px}.language-switcher svg{display:none}.language-switcher button{font-size:.82rem;padding:4px}.brand strong{max-width:180px}.brand span{max-width:190px}}

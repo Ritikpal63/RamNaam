@@ -1,45 +1,50 @@
 import { useState } from 'react';
 import api from '../api/client';
 import { useAuth } from '../context/AuthContext';
-
-const cards = [['11', 'दिन'], ['21', 'दिन'], ['40', 'दिन'], ['108', 'दिन'], ['1', 'लाख'], ['11', 'लाख']];
-const payloads = [
-  { title: '11 दिन का संकल्प', target: 1188, durationDays: 11 },
-  { title: '21 दिन का संकल्प', target: 2268, durationDays: 21 },
-  { title: '40 दिन का संकल्प', target: 4320, durationDays: 40 },
-  { title: '108 दिन का संकल्प', target: 11664, durationDays: 108 },
-  { title: '1 लाख राम नाम', target: 100000, durationDays: 365 },
-  { title: '11 लाख राम नाम', target: 1100000, durationDays: 1080 }
-];
+import { useLanguage } from '../context/LanguageContext';
 
 export default function PledgeSection() {
   const [message, setMessage] = useState('');
   const { user } = useAuth();
+  const { t, language } = useLanguage();
+
+  const cards = [
+    ['11', t('pledge.days')], ['21', t('pledge.days')], ['40', t('pledge.days')],
+    ['108', t('pledge.days')], ['1', t('pledge.lakh')], ['11', t('pledge.lakh')]
+  ];
+  const payloads = [
+    { title: t('pledge.title11'), target: 1188, durationDays: 11 },
+    { title: t('pledge.title21'), target: 2268, durationDays: 21 },
+    { title: t('pledge.title40'), target: 4320, durationDays: 40 },
+    { title: t('pledge.title108'), target: 11664, durationDays: 108 },
+    { title: t('pledge.title1L'), target: 100000, durationDays: 365 },
+    { title: t('pledge.title11L'), target: 1100000, durationDays: 1080 }
+  ];
 
   const createPledge = async (index) => {
-    if (!user) return setMessage('संकल्प लेने के लिए पहले लॉगिन करें।');
+    if (!user) return setMessage(t('pledge.loginFirst'));
     try {
       const { data } = await api.post('/pledges', payloads[index]);
-      setMessage(`संकल्प सफल। आपका Sankalp ID: ${data.pledge.sankalpId}`);
+      setMessage(t('pledge.success', { id: data.pledge.sankalpId }));
     } catch (error) {
-      setMessage(error.response?.data?.message || 'संकल्प सेव नहीं हो पाया।');
+      setMessage(language === 'hi' ? (error.response?.data?.message || t('pledge.failed')) : t('pledge.failed'));
     }
   };
 
   return (
     <section id="pledge" className="section-shell pledge-section">
       <div className="pledge-intro">
-        <span className="section-kicker">राम नाम संकल्प</span>
-        <h2>एक संकल्प — नियमित साधना की ओर</h2>
-        <p>अपनी सुविधा और श्रद्धा के अनुसार लक्ष्य चुनें। संख्या से अधिक महत्वपूर्ण नियमितता और भाव है।</p>
+        <span className="section-kicker">{t('pledge.kicker')}</span>
+        <h2>{t('pledge.title')}</h2>
+        <p>{t('pledge.description')}</p>
       </div>
       <div className="pledge-cards">
         {cards.map(([number, unit], index) => (
-          <button className="pledge-card" onClick={() => createPledge(index)} key={number + unit}>
+          <button className="pledge-card" onClick={() => createPledge(index)} key={`${index}-${number}-${unit}`}>
             <strong>{number}</strong>
             <span>{unit}</span>
-            <small>राम नाम संकल्प</small>
-            <em>संकल्प लें →</em>
+            <small>{t('pledge.cardLabel')}</small>
+            <em>{t('pledge.take')}</em>
           </button>
         ))}
       </div>

@@ -1,41 +1,46 @@
 import { useEffect, useState } from 'react';
 import api from '../api/client';
+import { useLanguage } from '../context/LanguageContext';
 
 export default function AdminDashboard() {
   const [overview, setOverview] = useState({});
+  const { t, locale } = useLanguage();
 
   useEffect(() => {
     api.get('/admin/overview').then((response) => setOverview(response.data)).catch(() => {});
   }, []);
 
+  const modules = [
+    t('admin.userManagement'), t('admin.verification'), t('admin.pledgeManagement'), t('admin.events'),
+    t('admin.sadhanaCms'), t('admin.gallery'), t('admin.news'), t('admin.certificates'), t('admin.volunteer'), t('admin.audit')
+  ];
+
   return (
     <main className="dashboard-page section-shell">
       <div className="page-heading">
-        <span className="section-kicker">Admin Panel</span>
-        <h1>अभियान प्रबंधन</h1>
+        <span className="section-kicker">{t('admin.panel')}</span>
+        <h1>{t('admin.title')}</h1>
       </div>
 
       <div className="dashboard-cards">
         {[
-          ['कुल साधक', overview.totalUsers || 0],
-          ['कुल राम नाम', overview.totalRamNames || 0],
-          ['आज के राम नाम', overview.todayRamNames || 0],
-          ['सक्रिय संकल्प', overview.activePledges || 0],
-          ['आगामी कार्यक्रम', overview.upcomingEvents || 0],
-          ['लंबित अनुभव', overview.pendingExperiences || 0]
+          [t('admin.totalUsers'), overview.totalUsers || 0],
+          [t('admin.totalRam'), overview.totalRamNames || 0],
+          [t('admin.todayRam'), overview.todayRamNames || 0],
+          [t('admin.activePledges'), overview.activePledges || 0],
+          [t('admin.upcomingEvents'), overview.upcomingEvents || 0],
+          [t('admin.pendingExperiences'), overview.pendingExperiences || 0]
         ].map(([label, value]) => (
           <article className="metric" key={label}>
             <span>{label}</span>
-            <strong>{Number(value).toLocaleString('en-IN')}</strong>
+            <strong>{Number(value).toLocaleString(locale)}</strong>
           </article>
         ))}
       </div>
 
       <section className="panel">
-        <div className="panel-title">Admin Modules</div>
-        <div className="admin-module-grid">
-          {['User Management', 'Ram Naam Verification', 'Pledge Management', 'Events', 'Daily Sadhana CMS', 'Gallery', 'News / Blog', 'Certificates', 'Volunteer / Seva', 'Audit Logs'].map((module) => <div key={module}>{module}</div>)}
-        </div>
+        <div className="panel-title">{t('admin.modules')}</div>
+        <div className="admin-module-grid">{modules.map((module) => <div key={module}>{module}</div>)}</div>
       </section>
     </main>
   );

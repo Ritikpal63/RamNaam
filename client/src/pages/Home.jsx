@@ -9,9 +9,11 @@ import RamNaamWriter from '../components/RamNaamWriter';
 import SadhanaEvents from '../components/SadhanaEvents';
 import SevaSection from '../components/SevaSection';
 import StatsStrip from '../components/StatsStrip';
+import { useLanguage } from '../context/LanguageContext';
 
 export default function Home() {
   const [stats, setStats] = useState({});
+  const { t } = useLanguage();
 
   useEffect(() => {
     api.get('/public/stats').then((response) => setStats(response.data)).catch(() => {});
@@ -29,12 +31,12 @@ export default function Home() {
       <MediaSection />
 
       <section className="section-shell final-cta">
-        <span>🌸 आज का संदेश</span>
-        <h2>“राम नाम को अपने दिन का एक छोटा, लेकिन नियमित हिस्सा बनाइए।”</h2>
-        <p>11 राम नाम से शुरुआत करें, 108 राम नाम का संकल्प लें या अपना बड़ा लक्ष्य निर्धारित करें।</p>
+        <span>{t('home.message')}</span>
+        <h2>{t('home.quote')}</h2>
+        <p>{t('home.quoteSub')}</p>
         <div>
-          <a className="btn primary" href="#write">राम नाम लिखना शुरू करें</a>
-          <a className="btn secondary" href="#pledge">संकल्प लें</a>
+          <a className="btn primary" href="#write">{t('hero.start')}</a>
+          <a className="btn secondary" href="#pledge">{t('home.takePledge')}</a>
         </div>
       </section>
 

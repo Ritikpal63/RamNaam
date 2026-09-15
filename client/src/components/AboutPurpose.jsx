@@ -1,16 +1,18 @@
 import { BookOpen, CalendarDays, HeartHandshake, MessageCircle } from 'lucide-react';
+import { useLanguage } from '../context/LanguageContext';
 
 export default function AboutPurpose() {
+  const { t } = useLanguage();
   return (
     <section className="section-shell about-purpose">
-      <span className="section-kicker">हमारे अभियान का उद्देश्य</span>
-      <h2>राम नाम लेखन • नाम-स्मरण • साधना • सेवा</h2>
-      <p>राम नाम लेखन मन को एकाग्र करने और भक्ति से जोड़ने का सरल माध्यम है। हमारा उद्देश्य अधिक से अधिक लोगों को नियमित साधना, सामूहिक भक्ति और सेवा से जोड़ना है।</p>
+      <span className="section-kicker">{t('about.kicker')}</span>
+      <h2>{t('about.title')}</h2>
+      <p>{t('about.description')}</p>
       <div className="purpose-grid">
-        <span><BookOpen /> प्रतिदिन राम नाम लिखें</span>
-        <span><HeartHandshake /> सेवा कार्यों से जुड़ें</span>
-        <span><CalendarDays /> नियमित संकल्प निभाएं</span>
-        <span><MessageCircle /> अनुभव साझा करें</span>
+        <span><BookOpen /> {t('about.daily')}</span>
+        <span><HeartHandshake /> {t('about.seva')}</span>
+        <span><CalendarDays /> {t('about.pledge')}</span>
+        <span><MessageCircle /> {t('about.share')}</span>
       </div>
     </section>
   );

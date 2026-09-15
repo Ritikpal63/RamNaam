@@ -1,27 +1,29 @@
 import { useState } from 'react';
 import { Link, NavLink } from 'react-router-dom';
-import { HeartHandshake, LogOut, Menu, PenLine, UserRound, X } from 'lucide-react';
+import { HeartHandshake, Languages, LogOut, Menu, PenLine, UserRound, X } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
-
-const links = [
-  ['/', 'होम'],
-  ['/#write', 'राम नाम लेखन'],
-  ['/#pledge', 'संकल्प'],
-  ['/#sadhana', 'दैनिक साधना'],
-  ['/#seva', 'सेवा'],
-  ['/#events', 'कार्यक्रम'],
-  ['/#gallery', 'गैलरी'],
-  ['/#contact', 'संपर्क']
-];
+import { useLanguage } from '../context/LanguageContext';
 
 export default function Header() {
   const [open, setOpen] = useState(false);
   const { user, logout } = useAuth();
+  const { language, setLanguage, t } = useLanguage();
+
+  const links = [
+    ['/', t('common.home')],
+    ['/#write', t('common.ramWriting')],
+    ['/#pledge', t('common.pledge')],
+    ['/#sadhana', t('common.dailySadhana')],
+    ['/#seva', t('common.seva')],
+    ['/#events', t('common.events')],
+    ['/#gallery', t('common.gallery')],
+    ['/#contact', t('common.contact')]
+  ];
 
   return (
     <header className="site-header">
       <div className="topbar">
-        <div>॥ श्री राम जय राम जय जय राम ॥</div>
+        <div>{t('header.mantra')}</div>
         <div className="topbar-right">✉ info@ramnaamabhiyan.com   ☎ +91 12345 67890</div>
       </div>
 
@@ -29,54 +31,57 @@ export default function Header() {
         <Link className="brand" to="/">
           <div className="brand-mark">राम</div>
           <div>
-            <strong>श्री राम नाम लेखन अभियान</strong>
-            <span>बाबा नीम करौली महाराज की प्रेरणा से</span>
+            <strong>{t('header.brand')}</strong>
+            <span>{t('header.subtitle')}</span>
           </div>
         </Link>
 
-        <button className="menu-btn" onClick={() => setOpen((v) => !v)} aria-label="मेनू">
-          {open ? <X /> : <Menu />}
-        </button>
+        <div className="header-actions-mobile">
+          <div className="language-switcher" aria-label="Language selector">
+            <Languages size={17} />
+            <button className={language === 'hi' ? 'active' : ''} type="button" onClick={() => setLanguage('hi')}>HI</button>
+            <span>/</span>
+            <button className={language === 'en' ? 'active' : ''} type="button" onClick={() => setLanguage('en')}>EN</button>
+          </div>
+          <button className="menu-btn" onClick={() => setOpen((v) => !v)} aria-label={t('header.menu')}>
+            {open ? <X /> : <Menu />}
+          </button>
+        </div>
 
         <nav className={open ? 'main-nav open' : 'main-nav'}>
           {links.map(([url, label]) =>
             url.startsWith('/#') ? (
-              <a href={url.slice(1)} onClick={() => setOpen(false)} key={url}>
-                {label}
-              </a>
+              <a href={url.slice(1)} onClick={() => setOpen(false)} key={url}>{label}</a>
             ) : (
-              <NavLink to={url} onClick={() => setOpen(false)} key={url}>
-                {label}
-              </NavLink>
+              <NavLink to={url} onClick={() => setOpen(false)} key={url}>{label}</NavLink>
             )
           )}
 
           {user ? (
             <>
               <Link to={user.role === 'admin' ? '/admin' : '/dashboard'} onClick={() => setOpen(false)}>
-                <UserRound size={19} /> मेरी साधना
+                <UserRound size={19} /> {t('common.mySadhana')}
               </Link>
-              <button
-                className="nav-logout"
-                onClick={() => {
-                  logout();
-                  setOpen(false);
-                }}
-              >
-                <LogOut size={18} /> लॉगआउट
+              <button className="nav-logout" onClick={() => { logout(); setOpen(false); }}>
+                <LogOut size={18} /> {t('common.logout')}
               </button>
             </>
           ) : (
-            <Link className="nav-login" to="/login" onClick={() => setOpen(false)}>
-              लॉगिन
-            </Link>
+            <Link className="nav-login" to="/login" onClick={() => setOpen(false)}>{t('common.login')}</Link>
           )}
+
+          <div className="language-switcher desktop-language-switcher" aria-label="Language selector">
+            <Languages size={17} />
+            <button className={language === 'hi' ? 'active' : ''} type="button" onClick={() => setLanguage('hi')}>HI</button>
+            <span>/</span>
+            <button className={language === 'en' ? 'active' : ''} type="button" onClick={() => setLanguage('en')}>EN</button>
+          </div>
         </nav>
       </div>
 
       <div className="quick-strip">
-        <span><PenLine size={18} /> राम नाम लिखें</span>
-        <span><HeartHandshake size={18} /> भक्ति • साधना • सेवा</span>
+        <span><PenLine size={18} /> {t('header.writeRam')}</span>
+        <span><HeartHandshake size={18} /> {t('header.devotion')}</span>
       </div>
     </header>
   );

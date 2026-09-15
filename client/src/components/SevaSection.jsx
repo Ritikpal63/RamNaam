@@ -1,27 +1,27 @@
 import { GraduationCap, HeartHandshake, Stethoscope, Trees, Wheat } from 'lucide-react';
+import { useLanguage } from '../context/LanguageContext';
 
 export default function SevaSection() {
+  const { t } = useLanguage();
   const services = [
-    [Wheat, 'अन्न सेवा'],
-    [GraduationCap, 'शिक्षा सेवा'],
-    [Stethoscope, 'चिकित्सा सहायता'],
-    [Trees, 'वृक्षारोपण'],
-    [HeartHandshake, 'अन्य सेवा']
+    [Wheat, t('seva.food')],
+    [GraduationCap, t('seva.education')],
+    [Stethoscope, t('seva.medical')],
+    [Trees, t('seva.trees')],
+    [HeartHandshake, t('seva.other')]
   ];
 
   return (
     <section id="seva" className="section-shell panel seva">
       <div className="section-heading">
-        <span className="section-kicker">भक्ति से सेवा तक</span>
-        <h2>सेवा के हमारे संकल्प</h2>
-        <p>राम नाम के साथ सामाजिक और पर्यावरणीय सेवा से जुड़ें।</p>
+        <span className="section-kicker">{t('seva.kicker')}</span>
+        <h2>{t('seva.title')}</h2>
+        <p>{t('seva.description')}</p>
       </div>
       <div className="seva-grid">
-        {services.map(([Icon, label]) => (
-          <div key={label}><Icon size={30} /><strong>{label}</strong></div>
-        ))}
+        {services.map(([Icon, label]) => <div key={label}><Icon size={30} /><strong>{label}</strong></div>)}
       </div>
-      <a className="btn primary" href="#contact">सेवा में योगदान दें</a>
+      <a className="btn primary" href="#contact">{t('seva.contribute')}</a>
     </section>
   );
 }
